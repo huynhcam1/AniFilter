@@ -15,6 +15,8 @@ import com.otaliastudios.cameraview.Frame;
 import com.otaliastudios.cameraview.FrameProcessor;
 import com.otaliastudios.cameraview.Size;
 
+import java.util.List;
+
 public class FaceDetector {
 
     private CameraView cameraView;
@@ -35,10 +37,24 @@ public class FaceDetector {
             @Override
             public void process(@NonNull Frame frame) {
                 byte[] data = frame.getData();
-                int rotation = frame.getRotation();
-                long time = frame.getTime();
+                int rotation = frame.getRotation() / 90;
                 Size size = frame.getSize();
-                int format = frame.getFormat();
+                FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
+                        .setWidth(frame.getSize().getWidth())
+                        .setHeight(frame.getSize().getHeight())
+                        .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+                        .setRotation(rotation)
+                        .build();
+                FirebaseVisionImage image = FirebaseVisionImage.fromByteArray(data, metadata);
+                Task<List<FirebaseVisionFace>> task = detector.detectInImage(image);
+                task.addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
+                    @Override
+                    public void onSuccess(List<FirebaseVisionFace> firebaseVisionFaces) {
+                        if (firebaseVisionFaces.size() > 0) {
+                            overlayView.setFace(firebaseVisionFaces.get(0));
+                        }
+                    }
+                });
             }
         });
     }

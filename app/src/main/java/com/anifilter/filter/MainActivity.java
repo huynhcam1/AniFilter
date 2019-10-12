@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         cameraView = findViewById(R.id.camera_view);
+        overlayView = findViewById(R.id.overlay_view);
         checkAndRequestCameraPermission();
     }
 
