@@ -37,11 +37,11 @@ public class FaceDetector {
             @Override
             public void process(@NonNull Frame frame) {
                 byte[] data = frame.getData();
-                int rotation = frame.getRotation() / 90;
+                final int rotation = frame.getRotation() / 90;
                 Size size = frame.getSize();
                 FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
-                        .setWidth(frame.getSize().getWidth())
-                        .setHeight(frame.getSize().getHeight())
+                        .setWidth(size.getWidth())
+                        .setHeight(size.getHeight())
                         .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
                         .setRotation(rotation)
                         .build();
@@ -51,6 +51,17 @@ public class FaceDetector {
                     @Override
                     public void onSuccess(List<FirebaseVisionFace> firebaseVisionFaces) {
                         if (firebaseVisionFaces.size() > 0) {
+                            if (cameraView.getPreviewSize() != null) {
+                                int width = cameraView.getPreviewSize().getWidth();
+                                int height = cameraView.getPreviewSize().getHeight();
+                                if (rotation / 2 == 0) {
+                                    overlayView.setPreviewWidth(width);
+                                    overlayView.setPreviewHeight(height);
+                                } else {
+                                    overlayView.setPreviewWidth(height);
+                                    overlayView.setPreviewHeight(width);
+                                }
+                            }
                             overlayView.setFace(firebaseVisionFaces.get(0));
                         }
                     }
