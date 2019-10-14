@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:keepScreenOn="true"
+        app:cameraAudio="off"
         app:cameraFacing="front" />
 
     <com.anifilter.filter.OverlayView

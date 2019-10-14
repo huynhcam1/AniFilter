@@ -15,12 +15,12 @@ public class MainActivityLifecycleObserver implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void startCamera() {
-        cameraView.start();
+        cameraView.open();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void pauseCamera() {
-        cameraView.stop();
+        cameraView.close();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

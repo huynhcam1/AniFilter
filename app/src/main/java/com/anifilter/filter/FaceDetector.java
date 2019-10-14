@@ -11,9 +11,9 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import com.otaliastudios.cameraview.CameraView;
-import com.otaliastudios.cameraview.Frame;
-import com.otaliastudios.cameraview.FrameProcessor;
-import com.otaliastudios.cameraview.Size;
+import com.otaliastudios.cameraview.frame.Frame;
+import com.otaliastudios.cameraview.frame.FrameProcessor;
+import com.otaliastudios.cameraview.size.Size;
 
 import java.util.List;
 
@@ -51,10 +51,10 @@ public class FaceDetector {
                     @Override
                     public void onSuccess(List<FirebaseVisionFace> firebaseVisionFaces) {
                         if (firebaseVisionFaces.size() > 0) {
-                            if (cameraView.getPreviewSize() != null) {
-                                int width = cameraView.getPreviewSize().getWidth();
-                                int height = cameraView.getPreviewSize().getHeight();
-                                if (rotation / 2 == 0) {
+                            if (cameraView.getSnapshotSize() != null) {
+                                int width = cameraView.getSnapshotSize().getWidth();
+                                int height = cameraView.getSnapshotSize().getHeight();
+                                if (rotation / 2 == 1) {
                                     overlayView.setPreviewWidth(width);
                                     overlayView.setPreviewHeight(height);
                                 } else {

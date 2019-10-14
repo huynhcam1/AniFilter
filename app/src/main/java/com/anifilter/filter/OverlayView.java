@@ -47,7 +47,7 @@ public class OverlayView extends View {
                 heightScaleFactor = (float) getHeight() / previewHeight;
             }
             drawGlasses(canvas, face);
-            drawCigarette(canvas, face);
+//            drawCigarette(canvas, face);
         }
     }
 
@@ -58,9 +58,9 @@ public class OverlayView extends View {
             Float eyeDistance = leftEye.getPosition().getX() - rightEye.getPosition().getX();
             Float delta = (widthScaleFactor * eyeDistance / 2);
             int left = translateX(leftEye.getPosition().getX()).intValue() - delta.intValue();
-            int top = translateY(leftEye.getPosition().getY()).intValue() + delta.intValue();
+            int top = translateY(leftEye.getPosition().getY()).intValue() - delta.intValue();
             int right = translateX(rightEye.getPosition().getX()).intValue() + delta.intValue();
-            int bottom = translateY(rightEye.getPosition().getY()).intValue() - delta.intValue();
+            int bottom = translateY(rightEye.getPosition().getY()).intValue() + delta.intValue();
             Rect glassesRect = new Rect(left, top, right, bottom);
             canvas.drawBitmap(glasses, null, glassesRect, null);
         }
