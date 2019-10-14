@@ -1,6 +1,5 @@
 package com.anifilter.filter;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Lifecycle;
@@ -11,11 +10,12 @@ import android.os.Bundle;
 
 import com.otaliastudios.cameraview.CameraView;
 
+import static com.otaliastudios.cameraview.CameraView.PERMISSION_REQUEST_CODE;
+
 public class MainActivity extends AppCompatActivity {
 
     CameraView cameraView;
     OverlayView overlayView;
-    private final int PERMISSION_REQUEST_CODE = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +38,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startFaceDetector() {
+        // initialize a lifecycle to observe the state of the camera view
         Lifecycle lifecycle = getLifecycle();
         lifecycle.addObserver(new MainActivityLifecycleObserver(cameraView));
+        // start face detection
         FaceDetector faceDetector =  new FaceDetector(cameraView, overlayView);
         faceDetector.startProcessing();
     }

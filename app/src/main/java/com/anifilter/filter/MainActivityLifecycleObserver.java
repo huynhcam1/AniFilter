@@ -5,6 +5,8 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import com.otaliastudios.cameraview.CameraView;
 
+/* This is a observer class that observes the state of the camera view.
+* ie. pauses the application if user clicks menu button on phone */
 public class MainActivityLifecycleObserver implements LifecycleObserver {
 
     private CameraView cameraView;

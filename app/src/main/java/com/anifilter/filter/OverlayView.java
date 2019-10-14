@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.graphics.*;
+
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
@@ -16,7 +17,6 @@ public class OverlayView extends View {
     private float widthScaleFactor = 1.0f;
     private float heightScaleFactor = 1.0f;
     private Bitmap glasses = BitmapFactory.decodeResource(getResources(), R.drawable.glasses);
-    private Bitmap cigarette = BitmapFactory.decodeResource(getResources(), R.drawable.cigarette);
 
 
     public OverlayView(Context context, AttributeSet attributeSet) {
@@ -30,12 +30,10 @@ public class OverlayView extends View {
 
     public void setPreviewWidth(int width) {
         this.previewWidth = width;
-//        postInvalidate();
     }
 
     public void setPreviewHeight(int height) {
         this.previewHeight = height;
-//        postInvalidate();
     }
 
     @Override
@@ -47,7 +45,6 @@ public class OverlayView extends View {
                 heightScaleFactor = (float) getHeight() / previewHeight;
             }
             drawGlasses(canvas, face);
-//            drawCigarette(canvas, face);
         }
     }
 
@@ -55,44 +52,21 @@ public class OverlayView extends View {
         FirebaseVisionFaceLandmark leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
         FirebaseVisionFaceLandmark rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
         if (leftEye != null && rightEye != null) {
-            Float eyeDistance = leftEye.getPosition().getX() - rightEye.getPosition().getX();
-            Float delta = (widthScaleFactor * eyeDistance / 2);
-            int left = translateX(leftEye.getPosition().getX()).intValue() - delta.intValue();
-            int top = translateY(leftEye.getPosition().getY()).intValue() - delta.intValue();
-            int right = translateX(rightEye.getPosition().getX()).intValue() + delta.intValue();
-            int bottom = translateY(rightEye.getPosition().getY()).intValue() + delta.intValue();
-            Rect glassesRect = new Rect(left, top, right, bottom);
+            // translate camera view coordinate system to canvas coordinate system
+            Float leftEyeX = (previewWidth - leftEye.getPosition().getX()) * widthScaleFactor;
+            Float rightEyeX = (previewWidth - rightEye.getPosition().getX()) * widthScaleFactor;
+            Float leftEyeY = leftEye.getPosition().getY() * heightScaleFactor;
+            Float rightEyeY = rightEye.getPosition().getY() * heightScaleFactor;
+            Float eyeDistance = rightEyeX - leftEyeX;
+            Float delta = eyeDistance / 2; // set boundary of glasses to be half of eye distance
+            int left = leftEyeX.intValue() - delta.intValue();
+            int top = leftEyeY.intValue() + delta.intValue();
+            int right = rightEyeX.intValue() + delta.intValue();
+            int bottom = rightEyeY.intValue() - delta.intValue();
+            int offset = 200; // offset value to reposition glasses (tested on S6)
+            // create dimensions and draw glasses on canvas
+            Rect glassesRect = new Rect(left+offset, top, right+offset, bottom);
             canvas.drawBitmap(glasses, null, glassesRect, null);
         }
-    }
-
-    private void drawCigarette(Canvas canvas, FirebaseVisionFace face) {
-        FirebaseVisionFaceLandmark leftMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT);
-        FirebaseVisionFaceLandmark rightMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT);
-        if (leftMouth != null && rightMouth != null) {
-            Float mouthLength = (leftMouth.getPosition().getX() - rightMouth.getPosition().getX()) * widthScaleFactor;
-            int left = translateX(leftMouth.getPosition().getX()).intValue() - mouthLength.intValue();
-            int top = translateY(leftMouth.getPosition().getY()).intValue() + mouthLength.intValue();
-            int right = translateX(rightMouth.getPosition().getX()).intValue();
-            int bottom = translateY(rightMouth.getPosition().getY()).intValue();
-            Rect glassesRect = new Rect(left, top, right, bottom);
-            canvas.drawBitmap(cigarette, null, glassesRect, null);
-        }
-    }
-
-    private Float translateX(Float f) {
-        return getWidth() - scaleX(f);
-    }
-
-    private Float translateY(Float f) {
-        return scaleY(f);
-    }
-
-    private float scaleX(Float f) {
-        return f * widthScaleFactor;
-    }
-
-    private float scaleY(Float f) {
-        return f * heightScaleFactor;
     }
 }

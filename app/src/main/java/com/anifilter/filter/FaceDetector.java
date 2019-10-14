@@ -27,25 +27,31 @@ public class FaceDetector {
     public FaceDetector(CameraView cameraView, OverlayView overlayView) {
         this.cameraView = cameraView;
         this.overlayView = overlayView;
+        // select options to allow face landmarks, then initialize face detector
         FirebaseVisionFaceDetectorOptions.Builder fdo = new FirebaseVisionFaceDetectorOptions.Builder();
         options = fdo.setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS).build();
         detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
     }
 
     void startProcessing() {
+        // obtain the frames rom the camera view
         cameraView.addFrameProcessor(new FrameProcessor() {
             @Override
             public void process(@NonNull Frame frame) {
                 byte[] data = frame.getData();
+                // rotation represented in int value instead of degrees for meta data
                 final int rotation = frame.getRotation() / 90;
                 Size size = frame.getSize();
+                // define image parameters ie. width, height, color encoding format, rotation
                 FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
                         .setWidth(size.getWidth())
                         .setHeight(size.getHeight())
                         .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
                         .setRotation(rotation)
                         .build();
+                // buil image using the frame data and metadata
                 FirebaseVisionImage image = FirebaseVisionImage.fromByteArray(data, metadata);
+                // if detector detects a face, transfer information to overlay view to generate filter
                 Task<List<FirebaseVisionFace>> task = detector.detectInImage(image);
                 task.addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
                     @Override
@@ -54,7 +60,7 @@ public class FaceDetector {
                             if (cameraView.getSnapshotSize() != null) {
                                 int width = cameraView.getSnapshotSize().getWidth();
                                 int height = cameraView.getSnapshotSize().getHeight();
-                                if (rotation / 2 == 1) {
+                                if (rotation / 2 == 1) { // rotation = 3 if phone is upright
                                     overlayView.setPreviewWidth(width);
                                     overlayView.setPreviewHeight(height);
                                 } else {
