@@ -7,6 +7,8 @@ import androidx.lifecycle.Lifecycle;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.otaliastudios.cameraview.CameraView;
 
@@ -16,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     CameraView cameraView;
     OverlayView overlayView;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         cameraView = findViewById(R.id.camera_view);
         overlayView = findViewById(R.id.overlay_view);
+        button = findViewById(R.id.button_id);
         checkAndRequestCameraPermission();
     }
 
@@ -31,10 +35,8 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[] {Manifest.permission.CAMERA}, PERMISSION_REQUEST_CODE);
-            startFaceDetector();
-        } else {
-             startFaceDetector();
         }
+        startFaceDetector();
     }
 
     private void startFaceDetector() {
@@ -42,8 +44,12 @@ public class MainActivity extends AppCompatActivity {
         Lifecycle lifecycle = getLifecycle();
         lifecycle.addObserver(new MainActivityLifecycleObserver(cameraView));
         // start face detection
-        FaceDetector faceDetector =  new FaceDetector(cameraView, overlayView);
-        faceDetector.startProcessing();
+        final FaceDetector faceDetector =  new FaceDetector(cameraView, overlayView);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                faceDetector.startProcessing();
+            }
+        });
     }
 
 }
